@@ -15,9 +15,11 @@ func getEnv(key string) (env string) {
 }
 
 func main() {
-	ntu := NoTypeUsername{
-		CredPath: getEnv("CRED_PATH"),
-		SamlPath: getEnv("SAML_PATH"),
+	ntu := NtuCOOL{
+		NoTypeUsername{
+			CredPath: getEnv("CRED_PATH"),
+			SamlPath: getEnv("SAML_PATH"),
+		},
 	}
-	ntu.LoginNTUCOOL()
+	Login(&ntu)
 }
