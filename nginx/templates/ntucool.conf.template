@@ -1,0 +1,10 @@
+server {
+    listen 8081;
+    server_name cool.ntu.edu.tw;
+
+    location / {
+        proxy_pass https://cool.ntu.edu.tw;
+        include ${COOKIE_PATH};
+        proxy_set_header Cookie $cookies;
+    }
+}

@@ -16,7 +16,7 @@ func Login(l Loginable) error {
 // implements NoTypeUsernameLoginner
 type NoTypeUsername struct {
 	CredPath   string
-	SamlPath   string
+	CookiePath string
 	client     *http.Client
 	noRedirect bool
 }

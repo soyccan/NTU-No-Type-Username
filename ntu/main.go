@@ -17,8 +17,8 @@ func getEnv(key string) (env string) {
 func main() {
 	ntu := NtuCOOL{
 		NoTypeUsername{
-			CredPath: getEnv("CRED_PATH"),
-			SamlPath: getEnv("SAML_PATH"),
+			CredPath:   getEnv("CRED_PATH"),
+			CookiePath: getEnv("COOKIE_PATH"),
 		},
 	}
 	Login(&ntu)

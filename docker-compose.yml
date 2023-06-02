@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  proxy:
+    image: nginxinc/nginx-unprivileged:1.25-alpine3.17
+    volumes:
+      - shared:/shared:ro
+      # NGINX docker image renders the templates with env vars automatically
+      - ./nginx/templates:/etc/nginx/templates:ro
+    environment:
+      - COOKIE_PATH=/shared/cookies.conf
+    depends_on:
+      - login
+    ports:
+      - 1000-2000:8081
+    command: [nginx-debug, -g, "daemon off;"]
+  login:
+    build: ./ntu
+    secrets:
+      - credentials.json
+    volumes:
+      - shared:/shared
+    environment:
+      - CRED_PATH=/run/secrets/credentials.json
+      - COOKIE_PATH=/shared/cookies.conf
+      # for nginx to access shared cookies file
+      - UID=101
+      - GID=101
+  # ofelia:
+  #   # a periodic job scheduler
+  #   image: mcuadros/ofelia:v0.3.7
+  #   command: daemon --docker
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   labels:
+  #     ofelia.job-run.login.schedule: "@every 1min"
+  #     ofelia.job-run.login.image: ntu-no-type-username-login
+secrets:
+  credentials.json:
+    file: .credentials.json
+volumes:
+  shared:

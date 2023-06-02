@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 )
 
 type NtuCOOL struct {
@@ -104,6 +106,26 @@ func (ntu *NtuCOOL) checkSucceedLogin(coolURL, samlResp string) (
 	return
 }
 
+// Convert cookies into HTTP header format
+// Example: "Cookies: log_session_id=c550c10407e11107b156f34ffbd60c47; _csrf_token=gKU%2Fci5TKNlELoFuUqK2FWY6tON4vvDwxx"
+func formatCookiesHeader(jar http.CookieJar, url_ string) string {
+	var cookies []string
+	u, err := url.Parse(url_)
+	if err != nil {
+		log.Fatal("url parse failed")
+	}
+	for _, c := range jar.Cookies(u) {
+		cookies = append(cookies, c.String())
+	}
+	return strings.Join(cookies, "; ")
+}
+
+// Convert cookies into a NGINX config that set the cookies to a var
+// Example:
+func formatCookiesNginx(jar http.CookieJar, url_ string) string {
+	return fmt.Sprintf("set $cookies \"%s\";", formatCookiesHeader(jar, url_))
+}
+
 func (ntu *NtuCOOL) Login() (err error) {
 	coolURL := "https://cool.ntu.edu.tw/login/saml"
 	samlResp, err := ntu.authSAML(coolURL)
@@ -125,8 +147,12 @@ func (ntu *NtuCOOL) Login() (err error) {
 		return
 	}
 
-	// write SAMLResponse to file
-	err = ioutil.WriteFile(ntu.SamlPath, []byte(samlResp), 0666)
+	// write cookies to file
+	err = ioutil.WriteFile(
+		ntu.CookiePath,
+		[]byte(formatCookiesNginx(ntu.client.Jar, coolURL)),
+		0666,
+	)
 	if err != nil {
 		log.Fatal("Write to SAML file fail:", err)
 		return

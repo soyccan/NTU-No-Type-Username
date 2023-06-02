@@ -11,8 +11,8 @@
             "mode": "auto",
             "program": "${workspaceFolder}/ntu",
             "env": {
-                "CRED_PATH": ".credentials.json",
-                "SAML_PATH": ".saml-response"
+                "CRED_PATH": "../.credentials.json",
+                "COOKIE_PATH": ".cookies"
             }
         }
     ]
