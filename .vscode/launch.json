@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/login",
+            "program": "${workspaceFolder}/ntu",
             "env": {
                 "CRED_PATH": ".credentials.json",
                 "SAML_PATH": ".saml-response"
