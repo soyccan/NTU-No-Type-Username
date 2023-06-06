@@ -1,0 +1,52 @@
+#!/bin/sh
+
+new_chain() {
+    sudo iptables -t nat -N "$@"
+}
+
+flush_chain() {
+    sudo iptables -t nat -F "$@"
+}
+
+clean_chain() {
+    new_chain "$@" >/dev/null 2>&1 || flush_chain "$@"
+}
+
+add_rule() {
+    if ! sudo iptables -t nat -C "$@" >/dev/null 2>&1; then
+        sudo iptables -t nat -A "$@"
+    fi
+}
+
+show_rules() {
+    sudo iptables-save -t nat
+}
+
+# set -ux
+
+src_addr=10.8.0.4
+dest_addr=140.112.145.153
+container_name=ntu-no-type-username-proxy-1
+
+container_addr="$(docker inspect "$container_name" |
+    jq -r '.[].NetworkSettings.Networks[].IPAddress')"
+container_ports="$(docker inspect "$container_name" |
+    jq -r '.[].NetworkSettings.Ports | to_entries | map(select(.value != null)) | from_entries | keys[]')"
+
+clean_chain VPNPROXY
+add_rule PREROUTING -s "$src_addr"/32 -i tun0 -j VPNPROXY
+
+# add_rule VPNPROXY -d 140.112.145.153/32 -p tcp -m multiport --dports 80,443 -j DNAT --to-destination 192.168.16.2:80
+for port in $container_ports; do
+    portno=${port%/*}
+    prot=${port#*/}
+    if [ "$prot" != tcp ]; then
+        continue
+    fi
+
+    # redirect dest_addr:portno -> container_addr:portno
+    add_rule VPNPROXY -d "$dest_addr"/32 -p tcp -m tcp --dport "$portno" \
+        -j DNAT --to-destination "${container_addr}:${portno}"
+done
+
+show_rules

@@ -146,6 +146,7 @@ func (ntu *NtuCOOL) Login() (err error) {
 		log.Fatal("Login COOL failed")
 		return
 	}
+	log.Println("Login succeeded!")
 
 	// write cookies to file
 	err = ioutil.WriteFile(

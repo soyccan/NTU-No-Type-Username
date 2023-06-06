@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# 101 is the GID used by NGINX container
+chmod g+rx pki pki/issued pki/private
+chmod -R g+r pki/issued pki/private
+sudo chgrp 101 pki
+sudo chgrp 101 -R pki/issued pki/private

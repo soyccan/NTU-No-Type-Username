@@ -1,18 +1,22 @@
 version: "3.9"
 services:
+  # main proxy server that keeps a session
   proxy:
     image: nginxinc/nginx-unprivileged:1.25-alpine3.17
     volumes:
       - shared:/shared:ro
+      # TODO: fix uid mismatch with outside
+      - ./pki:/etc/nginx/pki:ro
       # NGINX docker image renders the templates with env vars automatically
       - ./nginx/templates:/etc/nginx/templates:ro
     environment:
       - COOKIE_PATH=/shared/cookies.conf
-    depends_on:
-      - login
     ports:
-      - 1000-2000:8081
+      - 1000-2000:80
+      - 1000-2000:443
     command: [nginx-debug, -g, "daemon off;"]
+
+  # agent to login and obtain a session
   login:
     build: ./ntu
     secrets:
@@ -25,17 +29,10 @@ services:
       # for nginx to access shared cookies file
       - UID=101
       - GID=101
-  # ofelia:
-  #   # a periodic job scheduler
-  #   image: mcuadros/ofelia:v0.3.7
-  #   command: daemon --docker
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   labels:
-  #     ofelia.job-run.login.schedule: "@every 1min"
-  #     ofelia.job-run.login.image: ntu-no-type-username-login
+
 secrets:
   credentials.json:
     file: .credentials.json
+
 volumes:
   shared:

@@ -1,10 +1,14 @@
 server {
-    listen 8081;
+    listen 80;
+    listen 443 ssl;
     server_name cool.ntu.edu.tw;
+
+    ssl_certificate /etc/nginx/pki/issued/cool.ntu.edu.tw.crt;
+    ssl_certificate_key /etc/nginx/pki/private/cool.ntu.edu.tw.key;
 
     location / {
         proxy_pass https://cool.ntu.edu.tw;
-        include ${COOKIE_PATH};
+        include ${COOKIE_PATH};  # set $cookies
         proxy_set_header Cookie $cookies;
     }
 }

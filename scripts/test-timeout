@@ -1,0 +1,25 @@
+#!/bin/sh
+
+refresh_website() {
+    curl localhost:1014 -w "%{http_code}" -s -o /dev/null
+}
+
+l=600
+u=36000
+
+refresh_website >/dev/null
+
+while [ $l -lt $u ]; do
+    m=$(( (l+u)/2 ))
+    echo l=$l u=$u m=$m
+
+    sleep $m
+
+    if [ "$(refresh_website)" = 200 ]; then
+        l=$(( m+1 ))
+    else
+        u=$m
+    fi
+done
+
+echo Session timeout is about $m sec
