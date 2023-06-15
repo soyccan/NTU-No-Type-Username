@@ -2,19 +2,16 @@ version: "3.9"
 services:
   # main proxy server that keeps a session
   proxy:
-    image: nginxinc/nginx-unprivileged:1.25-alpine3.17
+    build: proxy
     volumes:
       - shared:/shared:ro
       # TODO: fix uid mismatch with outside
       - ./pki:/etc/nginx/pki:ro
-      # NGINX docker image renders the templates with env vars automatically
-      - ./nginx/templates:/etc/nginx/templates:ro
     environment:
       - COOKIE_PATH=/shared/cookies.conf
     ports:
       - 1000-2000:80
       - 1000-2000:443
-    command: [nginx-debug, -g, "daemon off;"]
 
   # agent to login and obtain a session
   login:
