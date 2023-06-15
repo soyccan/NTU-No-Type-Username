@@ -107,7 +107,9 @@ func (ntu *NtuCOOL) checkSucceedLogin(coolURL, samlResp string) (
 }
 
 // Convert cookies into HTTP header format
-// Example: "Cookies: log_session_id=c550c10407e11107b156f34ffbd60c47; _csrf_token=gKU%2Fci5TKNlELoFuUqK2FWY6tON4vvDwxx"
+// Example:
+//
+//	log_session_id=c550c10407e11107b156f34ffbd60c47; _csrf_token=gKU%2Fci5TKNlELoFuUqK2FWY6tON4vvDwxx
 func formatCookiesHeader(jar http.CookieJar, url_ string) string {
 	var cookies []string
 	u, err := url.Parse(url_)
@@ -122,6 +124,8 @@ func formatCookiesHeader(jar http.CookieJar, url_ string) string {
 
 // Convert cookies into a NGINX config that set the cookies to a var
 // Example:
+//
+//	set $cookies "log_session_id=c550c10407e11107b156f34ffbd60c47; _csrf_token=gKU%2Fci5TKNlELoFuUqK2FWY6tON4vvDwxx";
 func formatCookiesNginx(jar http.CookieJar, url_ string) string {
 	return fmt.Sprintf("set $cookies \"%s\";", formatCookiesHeader(jar, url_))
 }

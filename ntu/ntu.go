@@ -13,7 +13,7 @@ func Login(l Loginable) error {
 	return l.Login()
 }
 
-// implements NoTypeUsernameLoginner
+// implements Loginable
 type NoTypeUsername struct {
 	CredPath   string
 	CookiePath string

@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 ENV COOKIE_PATH=
 
-COPY templates /etc/nginx/
-COPY docker-entrypoint.d/ /docker-entrypoint.d/
+COPY templates /etc/nginx/templates/
+COPY docker-entrypoint.d /docker-entrypoint.d/
 
 CMD ["nginx-debug", "-g", "daemon off;"]
