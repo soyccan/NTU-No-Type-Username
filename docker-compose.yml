@@ -4,11 +4,11 @@ services:
   proxy:
     build: proxy
     volumes:
-      - shared:/shared:ro
-      # TODO: fix uid mismatch with outside
+      - shared:/shared
       - ./pki:/etc/nginx/pki:ro
     environment:
       - COOKIE_PATH=/shared/cookies.conf
+      - SOCK_PATH=/shared/sock
     ports:
       - 1000-2000:80
       - 1000-2000:443
@@ -23,9 +23,7 @@ services:
     environment:
       - CRED_PATH=/run/secrets/credentials.json
       - COOKIE_PATH=/shared/cookies.conf
-      # for nginx to access shared cookies file
-      - UID=101
-      - GID=101
+      - SOCK_PATH=/shared/sock
 
 secrets:
   credentials.json:

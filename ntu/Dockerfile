@@ -1,16 +1,17 @@
+# syntax=docker/dockerfile:1
 FROM golang:1.20-alpine3.18
 
-# owner of cookies file
-ENV UID=nobody GID=nobody
+ENV CRED_PATH=credentials.json COOKIE_PATH=/shared/cookies.conf SOCK_PATH=/shared/sock
 
-ENV CRED_PATH=credentials.json COOKIE_PATH=/shared/cookies
-VOLUME /shared
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
+  apk add socat
 
 # check if login succeeds
 HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD test -s "$COOKIE_PATH"
 
 WORKDIR /ntu
-COPY *.go go.mod docker-entrypoint.sh ./
+COPY *.go go.mod ./
 RUN go install -v
 
+COPY docker-entrypoint.sh ./
 CMD ["/ntu/docker-entrypoint.sh"]

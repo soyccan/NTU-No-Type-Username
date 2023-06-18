@@ -21,5 +21,8 @@ func main() {
 			CookiePath: getEnv("COOKIE_PATH"),
 		},
 	}
-	Login(&ntu)
+	err := Login(&ntu)
+	if err != nil {
+		os.Exit(1)
+	}
 }
